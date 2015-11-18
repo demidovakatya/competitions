@@ -23,13 +23,14 @@ vignettes/*.pdf
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+.ipynb_checkpoints/
 
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
-env/
+venv/
 build/
 develop-eggs/
 dist/
