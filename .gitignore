@@ -21,6 +21,7 @@ vignettes/*.html
 vignettes/*.pdf
 =======
 # Byte-compiled / optimized / DLL files
+data/*
 env/
 __pycache__/
 *.py[cod]
