@@ -21,6 +21,7 @@ vignettes/*.html
 vignettes/*.pdf
 =======
 # Byte-compiled / optimized / DLL files
+env/
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
