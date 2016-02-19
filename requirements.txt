@@ -1,1 +1,13 @@
+appnope==0.1.0
+decorator==4.0.9
+gnureadline==6.3.3
+ipdb==0.8.3
+ipython==4.1.1
+ipython-genutils==0.1.0
+path.py==8.1.2
+pexpect==4.0.1
+pickleshare==0.6
+ptyprocess==0.5.1
+simplegeneric==0.8.1
+traitlets==4.1.0
 wget==3.2
