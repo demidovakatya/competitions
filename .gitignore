@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 */.gitignore
 *-checkpoint.ipynb
 .ipynb_checkpoints/*-checkpoint.ipynb
@@ -81,3 +82,11 @@ docs/_build/
 # PyBuilder
 target/
 >>>>>>> ed0065b... Initial commit
+=======
+*.Rproj
+.RData
+.Rhistory
+.Rproj.user/*
+
+.ipynb_checkpoints/*
+>>>>>>> 19b71f0... create .gitignore
