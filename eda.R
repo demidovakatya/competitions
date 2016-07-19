@@ -2,7 +2,7 @@ library(dplyr)
 library(ggplot2)
 
 options(scipen = 99999)
-Sys.setlocale(category = "LC_ALL", locale = "utf8")
+Sys.setlocale(category = "LC_ALL", locale = "utf-8")
 
 setwd("/Users/mac/Documents/talkingdata-mobile-user-demographics")
 source("R/read_all_the_files.R")
@@ -51,10 +51,15 @@ count.categories %>% is.na %>% colSums
 sum(count.categories$count) # [1] 459943
 
 # ------------------------------------- app.labels + label.categories
-merged.app.labels <- merge(app.labels, label.categories, all.x = T)#[-1]
-merged.app.labels %>% is.na %>% colSums
+# merged.app.labels <- merge(app.labels, label.categories, all.x = T)#[-1]
+# merged.app.labels %>% is.na %>% colSums
 # rm(label.categories)
 
-count.merged.categories <-
+# ------------------------------------------------
+# ----------------------------------------- phones
 
-# count.merged.categories <- merge(count.categories, label.categories, all.x = T)
+head(phones)
+phones %>% is.na %>% colSums
+
+(brands.count <- phones$brand %>% table %>% data.frame)
+models.count <- phones$device_model %>% table %>% data.frame
