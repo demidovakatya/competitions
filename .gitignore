@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 */.gitignore
 *-checkpoint.ipynb
 <<<<<<< HEAD
@@ -139,3 +140,7 @@ leaf-classification/data/images/*.jpg
 *.csv
 leaf-classification
 >>>>>>> 8fba12e... upd
+=======
+
+.ipynb_checkpoints/Untitled-checkpoint.ipynb
+>>>>>>> 5d01856... Initial commit
