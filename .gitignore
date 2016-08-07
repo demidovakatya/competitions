@@ -3,6 +3,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 */.gitignore
 *-checkpoint.ipynb
 <<<<<<< HEAD
@@ -144,3 +145,7 @@ leaf-classification
 
 .ipynb_checkpoints/Untitled-checkpoint.ipynb
 >>>>>>> 5d01856... Initial commit
+=======
+.ipynb_checkpoints/*-checkpoint.ipynb
+*.csv
+>>>>>>> 31ca09f... update
