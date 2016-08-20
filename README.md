@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Review Spam Prediction
 
 Scikit-learn based review spam prediction system.
@@ -72,3 +73,7 @@ The data schema can be represented in the following chart:
 *  `untitled.ipynb`, `untitled.R` – random stuff I tried,
 *  `eda.ipynb`, `eda.R` – exploratory data analysis.
 >>>>>>> 88b555e... add README.md
+=======
+# competition-1-mipt-fivt-ml-spring-2015
+Competition 1 (MIPT FIVT, ML, Spring 2015)
+>>>>>>> 8c19ae6... Initial commit
