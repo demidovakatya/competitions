@@ -4,6 +4,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 */.gitignore
 *-checkpoint.ipynb
 <<<<<<< HEAD
@@ -154,3 +155,7 @@ leaf-classification
 
 .DS_Store
 >>>>>>> bc8af01... added .gitignore
+=======
+.ipynb_checkpoints/*.ipynb
+*.csv
+>>>>>>> 1af6370... updated .gitignore
