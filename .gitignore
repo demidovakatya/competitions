@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 */.gitignore
 *-checkpoint.ipynb
 .ipynb_checkpoints/*-checkpoint.ipynb
@@ -129,3 +130,7 @@ target/
 leaf-classification/data/images/*.jpg
 
 >>>>>>> 9a0abf2... updated .gitignore
+=======
+*-checkpoint.ipynb
+*.csv
+>>>>>>> 8ad7b43... added .gitignore
