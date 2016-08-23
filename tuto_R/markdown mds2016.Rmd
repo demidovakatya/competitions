@@ -1,0 +1,192 @@
+---
+title: "Tutoriel R"
+output: html_document
+---
+  
+Ce tutoriel a pour but de guider les personnes souhaitant utiliser R pour participer au challenge.
+
+Il comporte cinq etapes :
+
+1. Import des donnees
+2. Analyse descriptive
+3. Preparation des donnees
+4. Creation d'un modele en cross validation
+5. Calcul des predictions et soumission
+
+
+## Import des donnees
+
+Avant de rentrer dans le vif du sujet, installons quelques packages necessaires pour ce tutoriel :
+```{r, message = F}
+if (!require(Hmisc)){install.packages("Hmisc")} ; library(Hmisc)
+if (!require(randomForest)){install.packages("randomForest")} ; library("randomForest")
+if (!require(ggplot2)){install.packages("randomForest")} ; library("ggplot2")
+if (!require(dplyr)){install.packages("dplyr")} ; library("dplyr")
+```
+
+Le datasets sont sous format `.csv`. Vous pouvez les importer dans l'espace de travail R avec le code ci-dessous.
+Pensez a changer le chemin du dossier contenant les data : `dossier_data`.
+```{r, message= F, warning= F}
+dossier_data = "/home/ubunty/Dropbox/FrenchData/Meilleur DS/tutoriel/data"
+chemin_train = paste0(dossier_data, "/boites_medicaments_train.csv")
+chemin_test = paste0(dossier_data, "/boites_medicaments_test.csv")
+train = read.table(chemin_train, sep = ";", header = T, fill = T, quote = "", encoding = 'UTF-8')
+test  = read.table(chemin_test,  sep = ";", header = T, fill = T, quote = "", encoding = 'UTF-8')
+```
+
+On est maintenant pret a attaquer les choses serieuses ! :)
+
+## Analyse descriptive
+
+### Structure des datasets
+
+Le dataset ```train``` comporte les caracteristiques et prix de 8564 boites de medicaments. C'est ce dataset que nous allons utiliser pour creer un modele.
+Chaque boite de medicament est decrite par une observation de 41 variables. Ces variables sont decrites dans le fichier `Description.pdf` present dans la cle usb.
+
+Le dataset ```test``` comporte les caracteristiques des 3671 boites de medicaments dont il faut predire le prix. A la difference de ```train```, le prix des boites de medicaments n'est bien sur pas inclus et une colonne `id` a ete rajoutee pour identifier les boites de medicaments pendant l'etape de soumission des predictions sur [Datascience.net](www.datascience.net)
+
+### Distribution des donnees
+
+Jetons maintenant un coup d'oeil a la distribution des donnees
+
+On remarque que la variable a predire `prix` a une tres grande dispersion.
+Visualisons sa distribution avec un histogramme :
+
+```{r, message= F, warning= F}
+ggplot(train, aes(prix)) + geom_histogram(binwidth = 1)
+```
+
+Essayons de reduire la dispersion en prenant le log du prix 
+
+```{r, message= F, warning= F}
+ggplot(train, aes(log(prix))) + geom_histogram(binwidth = 1) 
+```
+
+```{r, message= F, warning= F}
+# Influence sur le prix de la feature tx rembour
+ggplot(train, aes(x = tx.rembours, y = log(prix), fill = tx.rembours)) + geom_violin()
+```
+
+```{r, message= F, warning= F}
+# Influence sur le prix de la feature statut 
+ggplot(train, aes(x = statut, y = log(prix), fill = statut)) + geom_boxplot() 
+```
+
+## Preparation des donnees
+
+Pour faciliter la preparation de donnees, il est conseille de concatener les datasets `train` et `test` pour n'avoir a modifier qu'un dataset, quitte a les separer de nouveau par la suite.
+
+```{r, message= F, warning= F}
+# Cree une variable categorie pour pouvoir separer les datasets apres la preparation des donnees
+train$categorie = 'train' 
+test$categorie  = 'test'
+
+full = bind_rows(train, test) # Combine train et test pour avoir un seul dataset a manipuler
+```
+
+Certaines variables categorielles se sont transformees en texte lors de concatenation des deux data sets car certaines modalites etaient presentes dans un dataset mais inconnu dans l'autre. Corrigons cela:
+
+```{r}
+to_factor = c('etat.commerc' ,'tx.rembours', 'forme.pharma', 'voies.admin', 'statut.admin', 'titulaires', 'substances')
+full[,to_factor] = lapply(full[,to_factor] , factor)
+```
+
+
+### Regroupement de modalites rares
+
+Certaines variables categorielles presentent beaucoup de modalites ce qui peut poser des problemes lors de l'utilisation de certains algorithmes de machine learning.
+Un moyen de regler ce probleme est de combiner les occurrences rares dans un meme groupe appelle "OTHERS".
+
+Pour ce faire nous utilisons la fonction ```combine.levels()``` pour creer cinq nouvelles variables qui sont des versions combinees des variables ```libelle```, ```titulaires```, ```substances```, ```forme.pharma``` et ```voies.admin```
+
+Le niveau de regroupement choisit dans cette exemple est 0.01, ce qui signifie que toutes les modalites avec une frequence inferieur a 1% seront regroupes dans "OTHERS"
+```{r, message= F, warning= F}
+full$libelle_combined      = combine.levels(full$libelle,      minlev=.01)
+full$titulaires_combined   = combine.levels(full$titulaires,   minlev=.01) 
+full$substances_combined   = combine.levels(full$substances,   minlev=.01)
+full$forme.pharma_combined = combine.levels(full$forme.pharma, minlev=.01)
+full$voies.admin_combined  = combine.levels(full$voies.admin,  minlev=.01)
+```
+
+### Split train / test
+
+Nous avons plus haut fusionne `train` et `test` dans `full` pour gagner du temps lors de la creation de variables (un seul data set a modifier).
+
+On peut maintenant les separer de nouveau en utilisant la variable `categorie`.
+```{r, message= F, warning= F}
+train = full[full$categorie == 'train',]
+test  = full[full$categorie == 'test',]
+```
+
+## Creation d'un modele en cross validation
+
+Il est maintenant temps de creer un modele. Dans ce tutoriel nous allons construire une [Foret Aleatoire](https://fr.wikipedia.org/wiki/For%C3%AAt_d'arbres_d%C3%A9cisionnels).
+
+Pour ce faire nous utilisons toutes les variables dont nous disposons a l'exception des variables categorielles avec beaucoup de modalites que l'on a remplace plus haut par des versions combinees.
+
+Pour eviter le [surapprentissage](https://fr.wikipedia.org/wiki/Surapprentissage) et estimer les vraies performances de notre modele nous allons utiliser le critere de [validation croisee](https://fr.wikipedia.org/wiki/Validation_crois%C3%A9e), methode k-fold.
+
+
+```{r, message= F, warning= F}
+K = 5 # on partitionne l'echantillon en 5
+set.seed(123) # 
+train$cv_id = sample(1:K, nrow(train), replace = T)
+
+# on definit l'erreur MAPE
+mape_error = function(y, ypred){mean(abs((y - ypred)/y))*100}
+
+mape_vector = c()
+for(i in 1:K){
+  train_cv = train[train$cv_id != i, ]
+  test_cv  = train[train$cv_id == i, ]
+  
+  rf = randomForest(data  = train_cv,
+                  log(prix) ~ nb_plaquette + nb_ampoule + nb_flacon + nb_tube + nb_stylo + nb_seringue + 
+                    nb_pilulier + nb_sachet + nb_comprime + nb_gelule + nb_film + nb_poche + 
+                    nb_capsule + nb_ml + statut + etat.commerc + date.declar.annee + date.amm.annee + 
+                    agrement.col + tx.rembours + forme.pharma_combined + voies.admin_combined + 
+                    statut.admin + substances_combined + libelle_combined + titulaires_combined, 
+                  ntree = 10)
+  
+  mape        = mape_error(y = test_cv$prix, ypred = exp(predict(rf, test_cv))); print(mape)
+  mape_vector = append(mape_vector, mape)
+}
+print(mean(mape_vector))
+
+```
+
+
+Cela veut dire que notre modele predit les prix des medicaments avec 60% d'erreur en moyenne.
+Par exemple, si un medicament coute reellement 10 euros, notre prediction sera de 16 euros (ou 4 euros).
+
+#### Importance des variables 
+```{r, message= F, warning= F}
+varImpPlot(rf,type=2)
+```
+
+Les trois variables qui sont le plus importantes dans le modele sont :
+
+* la voie d'administration du comprime
+* le nombre de comprime 
+* le taux de remboursement associe au medicament 
+
+
+## Calcul des predictions et soumission
+
+Maintenant que nous avons cree un modele predictif, il est temps de predire les prix des boites de medicaments de l'echantillon test :
+
+```{r, message= F, warning= F}
+# on entraine de nouveau le modele, cette fois sur l'intégralite des donnees
+rf = randomForest(data  = train,
+                  log(prix) ~ nb_plaquette + nb_ampoule + nb_flacon + nb_tube + nb_stylo + nb_seringue + 
+                    nb_pilulier + nb_sachet + nb_comprime + nb_gelule + nb_film + nb_poche + 
+                    nb_capsule + nb_ml + statut + etat.commerc + date.declar.annee + date.amm.annee + 
+                    agrement.col + tx.rembours + forme.pharma_combined + voies.admin_combined + 
+                    statut.admin + substances_combined + libelle_combined + titulaires_combined, 
+                  ntree = 10)
+prix = exp(predict(rf, test)) # Predit le prix des boites de medicaments de l'echantillon de test
+soumission = data.frame(id = test$id, prix) # Cree un data.frame au bon format pour la soumission
+write.table(soumission, file = 'soumission.csv', sep = ';', row.names = F) # Sauvegarde la soumission
+```
+
+Vous etes maintenant pret a faire votre premiere soumission en uplodant le fichier `soumission.csv` sur [Datascience.net](www.datascience.net)
