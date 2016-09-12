@@ -45,6 +45,7 @@ help
 # ------------------
 # Data
 *.csv
+<<<<<<< HEAD
 *.zip
 *.xlsx
 style.css
@@ -149,3 +150,7 @@ leaf-classification
 .ipynb_checkpoints/*-checkpoint.ipynb
 *.csv
 >>>>>>> 31ca09f... update
+=======
+
+.DS_Store
+>>>>>>> bc8af01... added .gitignore
