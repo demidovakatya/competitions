@@ -1,3 +1,6 @@
 .ipynb_checkpoints/*.ipynb
 *.xlsx
 *.csv
+*.pyc
+*.png
+legacy/*
