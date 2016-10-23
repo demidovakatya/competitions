@@ -1,0 +1,296 @@
+---
+title: "SFCrime EDA"
+author: "yurkai"
+date: "24-28 February 2016"
+output: html_document
+---
+
+# За преступность в Сан-Франциско
+Данные были взяты из соревнования на kaggle.com [San Francisco Crime Classification](https://www.kaggle.com/c/sf-crime). Цель -- предсказать по координатам и времени категорию преступления
+
+Используются следующие библиотеки:
+
+```{r cache=TRUE, echo=TRUE, warning=FALSE}
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+```
+
+## 1. Данные
+```{r cache=TRUE, echo=FALSE}
+dat <- read.csv('./data/train.csv')
+dat$Dates <- as.character(dat$Dates)
+dat$year <- year(dat$Dates)
+dat$month <- month(dat$Dates)
+dat$hour <- hour(dat$Dates)
+```
+
+Были введены переменные `year`, `month`, `hour` (исходя из даты события). Общая информация о датасете:
+```{r cache=TRUE, echo=FALSE}
+str(dat)
+```
+
+Пропущенных значений нет. `DayOfWeek` соответствует дате.
+
+```{r cache=TRUE}
+sum(is.na(dat))
+sum(as.character(dat$DayOfWeek) != 
+    as.character(wday(dat$Dates, label=TRUE, abbr=FALSE)))
+```
+
+## 2. Преступления, их виды и распределение по года, месяцам, дням
+Самые массовые преступления:
+
+```{r cache=TRUE, echo=FALSE}
+crimes <- arrange(data.frame(table(dat$Category)), desc(Freq))
+qplot(dat$Category[dat$Category %in% crimes$Var1[1:5]],
+      main="Top Crimes", xlab="Crime category")
+# crimes
+```
+
+#### 2.1. Словарик
+Всего 39 категорий приступлений. Некоторые немного перекрываются друг с другом.
+
+```
+## 1                LARCENY/THEFT 174900 | Воровство, кражи
+## 2               OTHER OFFENSES 126182 | Другие правонарушения (административные, например, просрочены права или неподчинение полиции)
+## 3                 NON-CRIMINAL  92304 | Не преступления (покусала собака, сообщение о смерти, найдены чьи-то вещи)
+## 4                      ASSAULT  76876 | Нападение
+## 5                DRUG/NARCOTIC  53971 | Вещества
+## 6                VEHICLE THEFT  53781 | Угон ТС
+## 7                    VANDALISM  44725 | Вандализм
+## 8                     WARRANTS  42214 | (нарушение судебных предписаний ?) 
+## 9                     BURGLARY  36755 | Кража со взломом
+## 10              SUSPICIOUS OCC  31414 | Подозрительное происшествие
+## 11              MISSING PERSON  25989 | Пропал человек
+## 12                     ROBBERY  23000 | Ограбление
+## 13                       FRAUD  16679 | Мошенничество
+## 14      FORGERY/COUNTERFEITING  10609 | Подделка
+## 15             SECONDARY CODES   9985 | (?) - преступления совершенные несовершеннолетними (стрельба, банды), также содержит "домашние насилие"
+## 16                 WEAPON LAWS   8555 | Нарушение оборота оружия и взрывчатых веществ
+## 17                PROSTITUTION   7484 | Проституция
+## 18                    TRESPASS   7326 | (?) Посягательства (нахождение на запрещенной территории и т.п.)
+## 19             STOLEN PROPERTY   4540 | Украденная собственность (владение чужими вещами, электроникой)
+## 20       SEX OFFENSES FORCIBLE   4388 | Насильственные сексуальные преступления (принуждения к сексу, попытки и изнасилования, содомия!!)
+## 21          DISORDERLY CONDUCT   4320 | Хулиганство
+## 22                 DRUNKENNESS   4280 | Нахождение (быдлеж?) в нетрезвом виде
+## 23           RECOVERED VEHICLE   3138 | (типа, нашли украденное ТС?)
+## 24                  KIDNAPPING   2341 | Похищение (людей)
+## 25 DRIVING UNDER THE INFLUENCE   2268 | Вождение в нетрезвом виде
+## 26                     RUNAWAY   1946 | Побег (?)
+## 27                 LIQUOR LAWS   1903 | Нарушение оборота спиртного
+## 28                       ARSON   1513 | Поджог
+## 29                   LOITERING   1225 | Бродяжничество (попрошайничество, отказ покинуть территорию школы или парка и т.п.)
+## 30                EMBEZZLEMENT   1166 | Хищение (чего-то с работы или у партнеров)
+## 31                     SUICIDE    508 | Самоубийства
+## 32             FAMILY OFFENSES    491 | Семейные преступления
+## 33                  BAD CHECKS    406 | (подделка счетов/бумаг ?)
+## 34                     BRIBERY    289 | Взяточничество
+## 35                   EXTORTION    256 | Вымогательство
+## 36   SEX OFFENSES NON FORCIBLE    148 | Ненасильственные сексуальные преступления
+## 37                    GAMBLING    146 | Азартные игры
+## 38     PORNOGRAPHY/OBSCENE MAT     22 | Порнография/запрещенные материалы
+## 39                        TREA      6 | Околачиваться около производства :)
+```
+
+#### 2.2. Распределение преступлений в течение дня
+Количество преступлений в течение дня имеет характерный вид, одинаковый для всех лет и месяцев.
+
+```{r cache=TRUE, echo=FALSE}
+qplot(dat$hour[dat$year==2012], geom='histogram', binwidth = 1, col=I("white"))
+qplot(dat$hour[dat$month==3], geom='histogram', binwidth = 1, col=I("white"))
+#library(manipulate)
+# manipulate(
+#     hist(dat$hour[dat$year==x]), 
+#     x = slider(min(dat$year), max(dat$year)))
+```
+
+
+Количество преступлений в теченее дня имеет различия для разных дней недели. Рабочие дни имеют схожие графики, однако в пятницу и субботу они возрастают в вечерние и ночные часы. Их уровен высок в выходные, но в воскресенье вечерняя тендеция схожа с рабочими днями (убывает). Например:
+
+```{r cache=TRUE, echo=FALSE}
+ggplot(data=dat[dat$DayOfWeek %in% 
+                        c('Friday', 'Saturday', 'Sunday'),], 
+       aes(hour, fill=DayOfWeek)) + geom_bar(position = "dodge")
+```
+
+#### 2.3. Преступления по месяцам и годам
+
+Количество преступлений в год соизмеримо.
+
+```{r cache=TRUE, echo=FALSE}
+qplot(dat$year, geom='histogram', binwidth = 1, col=I("white"))
+```
+
+Преступления по месяцами распределены почти одинаково от года к году. Две основные тенденции:
+```{r cache=TRUE, echo=FALSE}
+qplot(dat$month[dat$year==2009], geom='histogram', binwidth = 1, col=I("white"))
+qplot(dat$month[dat$year==2010], geom='histogram', binwidth = 1, col=I("white"))
+```
+
+## Преступления по районам
+Преступления разбиты на районы, каждый из которых (вероятно) закреплен за своим полицейским департаментом. Всего их 10.
+
+```{r cache=TRUE, echo=FALSE}
+levels(dat$PdDistrict)
+```
+
+#### 3.1. Общая тендеция преступлений по райнам
+
+Относительное распределение преступлений по районам сохраняется каждый год. А также каждый месяц и по дням недели (гистограммы не приведены). Очевидно, районы можно разделить на криминальные и более-менее благополучные.
+
+```{r cache=TRUE, echo=FALSE}
+qplot(dat$PdDistrict[dat$year==2012])
+```
+
+В зависимости от времени суток, относительная частота преступлений плавает для некоторых районов. Например, для районов `Mission`, `Northern` она возрастает до уровня `Southern` и падает до среднего в дневные часы.
+
+```{r cache=TRUE, echo=FALSE}
+# manipulate(
+#     qplot(dat$PdDistrict[dat$hour==x]),
+#     x=slider(min(dat$hour), max(dat$hour))
+# )
+
+ggplot(data=dat[dat$hour %in% 
+                    c(3,13),], 
+       aes(PdDistrict, fill=factor(hour))) + geom_bar(position = "dodge")
+```
+
+#### 3.2. Топ-5 преступлений по районам
+
+```{r cache=TRUE, echo=FALSE}
+for (d in levels(dat$PdDistrict)){
+        cat('----------------------\n')
+        cat('District: ', d, '\n')
+        orderedCrimes <- data.frame(table(dat$Category[
+                dat$PdDistrict==d]))
+        print(arrange(orderedCrimes, desc(Freq))[1:5,])
+}
+```
+
+## 4. Преступления и их координаты
+Практически все координаты соответствуют районам. Есть несколько выбросов и точек, не соответствующих департаменту, но их нетрудно заметить. Точечный график по первым пяти тысячам строк: 
+```{r cache=TRUE, echo=FALSE}
+ggplot(dat[1:5000,], aes(X, Y)) + 
+        geom_point(aes(colour=PdDistrict), alpha=.9, size=2) + 
+        scale_colour_brewer(palette = "RdYlGn")
+```
+
+Некоторые данные неправильно введены. Они имеют координаты `[-120.5;90.0]`. Их можно заметить в общей информации (или построив точечный график). Эти 67 строк можно попытаться восстановить (по улицам и районам), однако пока они исключены из рассмотрения.
+
+```{r cache=TRUE, echo=TRUE}
+summary(dat[c('X','Y')])
+nrow(dat[dat$Y>40,])
+dat <- dat[dat$Y<40 ,]
+```
+
+#### 4.1. Тепловая карта преступлений
+Все преступления:
+
+```{r cache=TRUE, echo=FALSE}
+ggplot(dat, aes(X, Y)) + geom_point(alpha=.005, size=1)
+```
+
+Возможно имеет смысл учитывать плотность преступлений? Высокая плотность сосредоточена в районе `TENDERLOIN` и его окрестностях.
+
+```{r cache=TRUE, echo=FALSE}
+ggplot(dat[1:2000,], aes(X, Y)) + 
+    geom_point(aes(colour=(PdDistrict=='TENDERLOIN')), alpha=.1, size=4) + 
+    scale_colour_brewer(palette = "Set1")
+```
+
+Некоторые преступления имеют разные тепловые карты, например, `DRUGS` и `ASSAULT`: 
+
+```{r cache=TRUE, echo=FALSE}
+ggplot(dat[dat$Category %in% crimes$Var1[4:5],], aes(X, Y)) + 
+    geom_point(aes(colour=Category), alpha=.01, size=1)
+```
+
+С другой стороны, некоторые могут быть равномерно распределены по всему городу (`VEHICLE THEFT`):
+
+```{r cache=TRUE, echo=FALSE}
+ggplot(dat[dat$Category=='VEHICLE THEFT',], aes(X, Y)) + 
+    geom_point(alpha=.01, size=1)
+```
+
+## 5. Адреса и улицы
+Адреса с наибольшим количество преступлений:
+
+```{r cache=TRUE, echo=FALSE}
+addr <- arrange(data.frame(table(dat$Address)), desc(Freq))
+addr$Var1 <- as.character(addr$Var1)
+addr[1:10,]
+```
+
+#### 5.1. Разбиения на улицы
+Для простоты пусть имя улицы будет последними 2 словами из адреса. Улицы с самым большим количеством происшествий:
+
+```{r cache=TRUE, echo=FALSE}
+dat$streets <- sapply(as.character(dat$Address), function(x){
+        paste(tail(strsplit(x, " ")[[1]], 2), collapse = " ")
+})
+streets <- arrange(data.frame(table(dat$street)), desc(Freq))
+streets[1:20,]
+```
+
+Возможно стоит обучить классификатор, который по координатам будем выдавать принадлежность к улице. 
+
+Самые богатые на происшествия улицы. Все они находятся рядом (см. координаты).
+
+```{r cache=TRUE, echo=FALSE}
+ggplot(dat[dat$streets %in% streets[1:5,1],], aes(X, Y)) + geom_point(aes(colour=streets), alpha=1, size=1)
+```
+
+#### 5.2. Профили улиц
+Пожалуй, для таких улиц трудно выявить какую-либо специализацию по преступлениям. Она будет окрашена в цвет наиболее массовых преступлений, а среди них явных тендеций нет.
+
+```{r cache=TRUE, echo=FALSE}
+ggplot(dat[dat$streets %in% streets[1:5,1] &
+               dat$Category %in% crimes[1:3,1],], aes(X, Y)) + geom_point(aes(colour=Category), alpha=.4, size=3) + scale_colour_brewer(palette = "Set3")+
+    guides(colour = guide_legend(override.aes = list(alpha = 1)))
+```
+
+## 6. Решения полиции
+Большинство происшествий оказыаются без результата:
+
+```{r cache=TRUE, echo=FALSE}
+resolutions <- arrange(data.frame(table(dat$Resolution)), desc(Freq))
+resolutions
+```
+
+Распределение решений по преступлениям:
+```{r cache=TRUE, echo=FALSE}
+for (res in resolutions[,1]){
+        cat('----------------------\n')
+        cat('Resolution: ', res, '\n')
+        orderedCrimes <- data.frame(table(dat$Category[
+                dat$Resolution == res]))
+        print(arrange(orderedCrimes, desc(Freq))[1:5,])
+}
+```
+
+В `PSYCHOPATHIC CASE `, `LOCATED` и `ARREST, CITED` есть явные лидеры с большим отрывом.
+
+## 6. Итого
+Из-за того, что объемы достаточно большие, значения переменных с малой частотой  следует исключить, например, это происшествие `TREA` или решение `PROSECUTED FOR LESSER OFFENSE `
+
+На основе карт, графиков и т.п. надо синтезировать новые переменные, которые смогут помочь разделить выборку.
+
+Необходимо выявить преступления, которые локализованы в определенных районах/улицах и те, которые размазаны ровным слоем. Возможно, можно будет найти и другую переменную, по которому преступления буду как размазаны равномерно, так и иметь островки сосредоточений.
+
+Еще карты преступлений можно найти в более высоком разрешении (возможно это поможет с новыми идеями, на Гитхабе выбрать представление Raw и смотрет в исходном масштабе):
+
+[Преступления по районам](https://github.com/yurkai/SFCrime/blob/master/materials/crimesByDistrict.png), можно увидеть как координаты не соответствуют району. 
+[То же, в более мелких деталях](https://github.com/yurkai/SFCrime/blob/master/materials/crimesByDistrictBig.png), где можно увидеть сетку.
+
+Код этого документа доступен в ГитХабе:  (edaSFC.Rmd)[https://github.com/yurkai/SFCrime/blob/master/edaSFC.Rmd]
+
+
+
+
+
+
+
+
+
+
