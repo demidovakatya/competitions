@@ -1,25 +1,60 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 */.gitignore
 *-checkpoint.ipynb
 .ipynb_checkpoints/*-checkpoint.ipynb
-
-*-Ex.R
-*.csv
+=======
+# Misc. irrelevant files
 .DS_Store
+*/LICENSE
+
+>>>>>>> 9a0abf2... updated .gitignore
+
+# ------------------
+# R files
+.Rhistory
+.Rapp.history
+.RData
+*-Ex.R
+.Rproj.user/
+vignettes/*.html
+vignettes/*.pdf
 .httr-oauth
+*.Rproj
 .Rapp.history
 statinference-course-project.Rproj
 .RData
 .Rhistory
-.Rproj.user
-.Rproj.user/
 
 
-challenge-25/*.csv
+# ------------------
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+env
+help
+*-checkpoint.ipynb
+#.ipynb_checkpoints/*-checkpoint.ipynb
+
+# ------------------
+# Data
+*.csv
+*.zip
+*.xlsx
 style.css
+*/submissions/
+*/leaderboard/
+*/legacy/
+
+
+# ------------------
+# By folder
+# challenge-25/*.csv
 vignettes/*.html
 vignettes/*.pdf
+<<<<<<< HEAD
 =======
 # Byte-compiled / optimized / DLL files
 data/*
@@ -90,3 +125,7 @@ target/
 
 .ipynb_checkpoints/*
 >>>>>>> 19b71f0... create .gitignore
+=======
+leaf-classification/data/images/*.jpg
+
+>>>>>>> 9a0abf2... updated .gitignore
