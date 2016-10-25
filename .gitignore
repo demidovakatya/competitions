@@ -138,6 +138,7 @@ leaf-classification/data/images/*.jpg
 =======
 *-checkpoint.ipynb
 *.csv
+<<<<<<< HEAD
 >>>>>>> 8ad7b43... added .gitignore
 =======
 *.csv
@@ -159,3 +160,11 @@ leaf-classification
 .ipynb_checkpoints/*.ipynb
 *.csv
 >>>>>>> 1af6370... updated .gitignore
+=======
+*.zip
+*.xlsx
+*/data/
+*/submissions/
+*/leaderboard/
+*/legacy/
+>>>>>>> 6d3c073... clean up
