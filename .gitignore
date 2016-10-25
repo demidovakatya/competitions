@@ -1,3 +1,8 @@
 *-checkpoint.ipynb
 *.csv
-leaf-classification
+*.zip
+*.xlsx
+*/data/
+*/submissions/
+*/leaderboard/
+*/legacy/
