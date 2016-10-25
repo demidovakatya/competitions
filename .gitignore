@@ -4,6 +4,7 @@
 <<<<<<< HEAD
 */.gitignore
 *-checkpoint.ipynb
+<<<<<<< HEAD
 .ipynb_checkpoints/*-checkpoint.ipynb
 =======
 # Misc. irrelevant files
@@ -134,3 +135,7 @@ leaf-classification/data/images/*.jpg
 *-checkpoint.ipynb
 *.csv
 >>>>>>> 8ad7b43... added .gitignore
+=======
+*.csv
+leaf-classification
+>>>>>>> 8fba12e... upd
