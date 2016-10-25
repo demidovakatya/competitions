@@ -49,3 +49,10 @@ vignettes/*.pdf
 leaf-classification/data/images/*.jpg
 challenge-28/hospidiag.pdf
 
+=======
+.ipynb_checkpoints/*.ipynb
+*.xlsx
+*.csv
+*.pyc
+*.png
+legacy/*
