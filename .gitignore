@@ -1,21 +1,7 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-*/.gitignore
-*-checkpoint.ipynb
-<<<<<<< HEAD
-.ipynb_checkpoints/*-checkpoint.ipynb
 =======
 # Misc. irrelevant files
 .DS_Store
 */LICENSE
-
->>>>>>> 9a0abf2... updated .gitignore
-
 # ------------------
 # R files
 .Rhistory
@@ -46,7 +32,7 @@ help
 # ------------------
 # Data
 *.csv
-<<<<<<< HEAD
+
 *.zip
 *.xlsx
 style.css
@@ -54,13 +40,6 @@ style.css
 */leaderboard/
 */legacy/
 
-
-# ------------------
-# By folder
-# challenge-25/*.csv
-vignettes/*.html
-vignettes/*.pdf
-<<<<<<< HEAD
 =======
 # Byte-compiled / optimized / DLL files
 data/*
@@ -108,7 +87,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*,cover
+*.cover
 
 # Translations
 *.mo
@@ -122,49 +101,5 @@ docs/_build/
 
 # PyBuilder
 target/
->>>>>>> ed0065b... Initial commit
-=======
-*.Rproj
-.RData
-.Rhistory
-.Rproj.user/*
-
-.ipynb_checkpoints/*
->>>>>>> 19b71f0... create .gitignore
-=======
 leaf-classification/data/images/*.jpg
 
->>>>>>> 9a0abf2... updated .gitignore
-=======
-*-checkpoint.ipynb
-*.csv
-<<<<<<< HEAD
->>>>>>> 8ad7b43... added .gitignore
-=======
-*.csv
-leaf-classification
->>>>>>> 8fba12e... upd
-=======
-
-.ipynb_checkpoints/Untitled-checkpoint.ipynb
->>>>>>> 5d01856... Initial commit
-=======
-.ipynb_checkpoints/*-checkpoint.ipynb
-*.csv
->>>>>>> 31ca09f... update
-=======
-
-.DS_Store
->>>>>>> bc8af01... added .gitignore
-=======
-.ipynb_checkpoints/*.ipynb
-*.csv
->>>>>>> 1af6370... updated .gitignore
-=======
-*.zip
-*.xlsx
-*/data/
-*/submissions/
-*/leaderboard/
-*/legacy/
->>>>>>> 6d3c073... clean up
