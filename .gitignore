@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-*-checkpoint.ipynb
-*.csv
-*.zip
-*.xlsx
-*/data/
-*/submissions/
-*/leaderboard/
-*/legacy/
-=======
-=======
 # Misc. irrelevant files
 .DS_Store
 */LICENSE
@@ -42,7 +31,6 @@ help
 # ------------------
 # Data
 *.csv
-
 *.zip
 *.xlsx
 style.css
@@ -112,5 +100,3 @@ docs/_build/
 # PyBuilder
 target/
 leaf-classification/data/images/*.jpg
-
->>>>>>> 05b7eccc4630ae25cb82000202efa94b22998516
