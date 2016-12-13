@@ -1,0 +1,24 @@
+---
+title: "Fake News"
+output: html_notebook
+---
+
+> The dataset contains text and metadata from 244 websites and represents 12,999 posts in total from the past 30 days. The data was pulled using the [webhose.io API](https://webhose.io/api); because it's coming from their crawler, not all websites identified by the BS Detector are present in this dataset. Each website was labeled according to the BS Detector as documented here. Data sources that were missing a label were simply assigned a label of "`bs`". There are (ostensibly) no genuine, reliable, or trustworthy news sources represented in this dataset (so far), so don't trust anything you read.
+
+Let's read the data and have a look at it:
+
+```{r}
+fake <- read.csv('data/fake.csv')
+head(fake)
+```
+
+Let's remove `uuid`, because it doesn't provide any useful information:
+
+```{r}
+fake <- fake[-1]
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
