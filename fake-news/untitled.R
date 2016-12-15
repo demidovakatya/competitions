@@ -27,8 +27,16 @@ table(fake$published)
 table(fake$crawled)
 # TODO
 # preprocess
-mutate(fake, published = ymd_hms(published))
-mutate(fake, crawled = ymd_hms(crawled))
+fake <- mutate(fake, published = ymd_hms(published))
+fake <- mutate(fake, crawled = ymd_hms(crawled))
+
+# Add weekdays
+fake <- mutate(fake, published.weekday = weekdays(published))
+fake <- mutate(fake, crawled.weekday = weekdays(crawled))
+fake <- mutate(fake, published.weekday = weekdays(published))
+fake <- mutate(fake, crawled.weekday = weekdays(crawled))
+fake$crawled.weekday <- as.factor(fake$crawled.weekday)
+fake$published.weekday <- as.factor(fake$published.weekday)
 
 # -------
 # rpart
